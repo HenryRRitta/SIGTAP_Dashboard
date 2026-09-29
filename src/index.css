@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Inter", system-ui, "Segoe UI", sans-serif;
+  --font-sans: "Inter", system-ui, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --breakpoint-nav: 75rem;
+  --color-paper: #f5f7fb;
+  --color-ink: #15233b;
+  --color-moss: #4458e8;
+  --color-moss-2: #3546c9;
+  --color-leaf: #eef1ff;
+  --color-clay: #b42318;
+  --color-line: #e2e8f0;
+  --color-card: #ffffff;
+  --color-mute: #596980;
+  --color-mist: #f8fafc;
+  --color-sidebar: #122139;
+  --color-sidebar-hover: #1c3050;
+  --color-sidebar-active: #293f7a;
+  --color-sidebar-text: #cbd5e1;
+  --color-sidebar-muted: #a8b7cb;
+  --color-control: #8492a6;
+  --color-success: #087f73;
+  --color-success-bg: #e8f7f3;
+  --color-warning: #915300;
+  --color-warning-bg: #fff4dd;
+  --color-danger: #b42318;
+  --color-danger-bg: #fff0ee;
+  --color-info: #315ab5;
+  --color-info-bg: #edf3ff;
+  --color-neutral: #526174;
+  --color-neutral-bg: #eef2f6;
+  --shadow-card: 0 2px 8px rgb(18 33 57 / 4%);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+::selection {
+  background: #eef1ff;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-moss);
+  outline-offset: 3px;
+}
+
+aside :focus-visible {
+  outline-color: #a5b4fc;
+  outline-offset: -3px;
+}
+
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: 8px;
+  z-index: 80;
+  transform: translateY(-160%);
+  padding: 12px 16px;
+  background: #fff;
+  color: var(--color-moss);
+  border-radius: 8px;
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.field {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--color-control);
+  background: #fff;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.field:focus,
+.field:focus-visible {
+  border-color: var(--color-moss);
+  box-shadow: 0 0 0 3px rgb(68 88 232 / 0.18);
+}
+
+.font-display {
+  letter-spacing: -0.025em;
+}
+
+@media (width < 768px) {
+  .field {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  aside,
+  header,
+  nav,
+  .no-print,
+  .skip-link {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .print-sheet {
+    max-width: none;
+    padding: 0;
+  }
+}
