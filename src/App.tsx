@@ -15,6 +15,8 @@ import { LotePage } from "./pages/Lote";
 import { FilaPage } from "./pages/Fila";
 import { RegrasPage } from "./pages/Regras";
 import { SearchPage } from "./pages/Search";
+import { FavoritosPage } from "./pages/Favoritos";
+import { RelatoriosPage } from "./pages/Relatorios";
 import { PrintFichaPage } from "./pages/PrintFicha";
 import { PrintParecerPage } from "./pages/PrintParecer";
 
@@ -23,7 +25,7 @@ function Splash({ error }: { error: string | null }) {
     <div className="flex min-h-screen flex-col items-center justify-center bg-paper px-6 text-center">
       <BrandMark />
       <p className="font-mono mt-4 text-[11px] tracking-[0.22em] text-moss uppercase">Tabela unificada SUS</p>
-      <h1 className="font-display mt-2 text-4xl text-moss">Mesa SIGTAP</h1>
+      <h1 className="font-display mt-2 text-4xl text-navy">SIGTAP Executive</h1>
       <p className="mt-3 max-w-md text-mute">
         {error ?? "Carregando competência 08/2026 e indexando procedimentos, CID, CBO e consistências…"}
       </p>
@@ -44,6 +46,8 @@ export default function App() {
       <Route path="/print/parecer/:code" element={<PrintParecerPage />} />
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
+        <Route path="/relatorios" element={<RelatoriosPage />} />
+        <Route path="/favoritos" element={<FavoritosPage />} />
         <Route path="/pesquisa" element={<SearchPage />} />
         <Route path="/catalogo" element={<CatalogPage />} />
         <Route path="/procedimento/:code" element={<ProcedurePage />} />

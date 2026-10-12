@@ -98,6 +98,8 @@ export type Meta = {
   competenciaLabel: string;
   fonte: string;
   arquivo: string;
+  importadoEm?: string;
+  origemUrl?: string;
   totalProcedimentos: number;
   totalCids: number;
   totalCbos: number;

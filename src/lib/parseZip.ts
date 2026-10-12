@@ -68,9 +68,17 @@ function emptyRel(): Rel {
   };
 }
 
-export async function parseSigtapZip(file: File, onProgress?: (msg: string) => void): Promise<SigtapData> {
+export type SigtapZipSource = File | Blob | ArrayBuffer | Uint8Array;
+
+export async function parseSigtapZip(
+  file: SigtapZipSource,
+  onProgress?: (msg: string) => void,
+  opts?: { arquivo?: string; origemUrl?: string },
+): Promise<SigtapData> {
   onProgress?.("Lendo ZIP…");
   const zip = await JSZip.loadAsync(file);
+  const arquivoNome =
+    opts?.arquivo ?? (typeof File !== "undefined" && file instanceof File ? file.name : "sigtap.zip");
   const latin = (name: string) => {
     const entry = zip.file(name) ?? zip.file(new RegExp(`${name}$`, "i"))?.[0];
     return entry ? entry.async("uint8array").then((buf) => new TextDecoder("latin1").decode(buf)) : Promise.resolve("");
@@ -306,7 +314,9 @@ export async function parseSigtapZip(file: File, onProgress?: (msg: string) => v
       competencia,
       competenciaLabel: label,
       fonte: "Tabela Unificada de Procedimentos, Medicamentos e OPM do SUS",
-      arquivo: file.name,
+      arquivo: arquivoNome,
+      importadoEm: new Date().toISOString(),
+      origemUrl: opts?.origemUrl,
       totalProcedimentos: procedures.length,
       totalCids: cids.length,
       totalCbos: ocupacoes.length,

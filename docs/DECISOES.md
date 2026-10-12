@@ -33,3 +33,16 @@
 - **Contexto**: o repositório é compartilhado entre IAs e o responsável.
 - **Decisão**: IAs fazem apenas commit local. Sem push, rebase, `--no-verify` ou alteração de `git config`.
 - **Status**: inferida no bootstrap — confirmar com o usuário
+
+### [ADR-006] Typeahead em todos os campos de pesquisa
+- **Data**: 11/10/2026
+- **Contexto**: Henry pediu typeahead para não precisar completar a palavra nem clicar em Buscar.
+- **Decisão**: componente `TypeaheadField` nas buscas da home, top nav, SearchBox, CID/CBO, comparar, compatibilidades, auditoria, glosas, catálogo, favoritos e regras. Setas/Enter/clique escolhem o item.
+- **Status**: fechada com o usuário
+
+### [ADR-007] Catálogo local das competências oficiais de 2026
+- **Data**: 11/10/2026
+- **Contexto**: Henry pediu baixar todas as competências de 2026 e deixá-las no seletor da top nav.
+- **Decisão**: listar e baixar do FTP DATASUS o último ZIP de cada mês; gravar gzip em `data/competencias/`; o seletor troca a tabela ativa. Só entram meses publicados no FTP.
+- **Status**: fechada com o usuário
+

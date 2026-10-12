@@ -3,3 +3,5 @@ dist
 .DS_Store
 *.local
 data/raw
+data/zips
+data/competencias

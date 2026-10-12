@@ -13,6 +13,7 @@ import {
   type TetoLocal,
   type TussLocal,
 } from "../lib/local";
+import { TypeaheadField } from "../components/TypeaheadField";
 import { digits, formatCode } from "../lib/format";
 import { useSigtap } from "../lib/store";
 
@@ -191,9 +192,16 @@ function TetoForm({
         Teto de quantidade ou valor por procedimento (10 dígitos) ou prefixo (grupo/subgrupo). Vale na mesa e no lote.
       </p>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <Field label="Procedimento ou prefixo">
-          <input className="field" value={form.procedimento} onChange={(e) => setForm({ ...form, procedimento: e.target.value })} placeholder="0411010034 ou 04" />
-        </Field>
+        <div className="text-sm">
+          <span className="mb-1 block text-mute">Procedimento ou prefixo</span>
+          <TypeaheadField
+            variant="field"
+            placeholder="0411010034 ou 04"
+            value={form.procedimento}
+            onChange={(v) => setForm({ ...form, procedimento: v })}
+            onPick={(hit) => setForm({ ...form, procedimento: hit.code })}
+          />
+        </div>
         <Field label="Teto de quantidade">
           <input
             className="field"

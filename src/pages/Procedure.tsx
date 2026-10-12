@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Bookmark, ClipboardCheck, Copy, FileDown, GitCompare } from "lucide-react";
+import { ClipboardCheck, Copy, FileDown, GitCompare } from "lucide-react";
 import { BackLink } from "../components/BackLink";
+import { FavoriteButton } from "../components/FavoriteButton";
 import { auditScore, runAudit } from "../lib/audit";
 import { COMPAT_LABEL, COMPLEX_TONE, formatCode, money, relOf } from "../lib/format";
 import { checklistGlosa, familiaDaConta } from "../lib/glosa";
@@ -24,7 +25,7 @@ const TABS = [
 
 export function ProcedurePage() {
   const { code = "" } = useParams();
-  const { data, maps, byCode, pin, pinned, remember } = useSigtap();
+  const { data, maps, byCode, remember } = useSigtap();
   const proc = byCode(code);
   const [tab, setTab] = useState<(typeof TABS)[number]>("Visão");
 
@@ -42,7 +43,6 @@ export function ProcedurePage() {
   }
 
   const rel = relOf(proc);
-  const isPinned = pinned.includes(proc.c);
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -67,13 +67,7 @@ export function ProcedurePage() {
           {notaDe(proc.c) && <p className="mt-2 max-w-3xl text-sm text-moss">{notaDe(proc.c)}</p>}
         </div>
         <div className="flex flex-wrap gap-2 no-print">
-          <button
-            onClick={() => pin(proc.c)}
-            className={`rounded-xl border px-3 py-2 text-sm ${isPinned ? "border-moss bg-leaf text-moss" : "border-line bg-card"}`}
-          >
-            <Bookmark size={15} className="mr-1 inline" />
-            {isPinned ? "Fixado" : "Fixar"}
-          </button>
+          <FavoriteButton code={proc.c} label />
           <Link to={`/auditoria/${proc.c}`} className="rounded-xl bg-moss px-3 py-2 text-sm text-white">
             <ClipboardCheck size={15} className="mr-1 inline" />
             Simular conta

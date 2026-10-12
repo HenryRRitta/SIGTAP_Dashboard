@@ -43,10 +43,15 @@ export function CidPage() {
       <p className="mt-2 text-mute">Entre pelo diagnóstico ou pela ocupação e veja os procedimentos que a tabela autoriza.</p>
       <div className="mt-6">
         <SearchBox
+          source="cid-cbo"
           value={q}
           onChange={(v) => {
             setQ(v);
             setParams(v ? { q: v } : {});
+          }}
+          onPick={(hit) => {
+            setQ(hit.code);
+            setParams({ q: hit.code });
           }}
           placeholder="CID (I10, C50) ou CBO (225125) ou nome"
         />
