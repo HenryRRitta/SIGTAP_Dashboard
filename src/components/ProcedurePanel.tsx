@@ -39,7 +39,8 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
   const excluido = diff?.excluidos.find((x) => x.c === proc.c);
 
   return (
-    <aside className="exe-panel min-w-0 p-4">
+    <aside className="exe-panel min-w-0 overflow-hidden p-0">
+      <div className="p-4">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div>
           <h2 className="text-base font-semibold text-navy-950">Detalhes do procedimento</h2>
@@ -56,7 +57,6 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
         <p className="font-mono text-lg font-semibold text-moss">{formatCode(proc.c)}</p>
         <p className="text-[13px] font-semibold uppercase leading-snug text-navy-950">{proc.n}</p>
       </div>
-      <ExcludenciaStrip proc={proc} className="-mx-4 mt-3" />
       <div className="mt-3 flex flex-wrap gap-1.5">
         {rel.modalidades.slice(0, 2).map((m) => (
           <span key={m} className="rounded-full bg-leaf px-2 py-1 text-[11px] text-moss">
@@ -181,6 +181,8 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
           </Link>
         </div>
       )}
+      </div>
+      <ExcludenciaStrip proc={proc} />
     </aside>
   );
 }

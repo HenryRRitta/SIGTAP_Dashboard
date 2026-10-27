@@ -5,6 +5,14 @@ Alterações notáveis do projeto. Formato baseado em [Keep a Changelog](https:/
 
 ---
 
+## [2026-10-27] - pill-cid-typeahead
+
+### Adicionado
+- Pill “CID” na sugestão azul do typeahead quando a busca casa com um código CID-10 (`src/components/TypeaheadField.tsx`). Busca por nome ou código SIGTAP não mostra a pill.
+
+### Alterado
+- Faixa “Não cobrar junto” passou para o rodapé da ficha lateral e da ficha completa, abaixo de chips e conteúdo (`src/components/ProcedurePanel.tsx`, `src/pages/Procedure.tsx`).
+
 ## [2026-10-27] - excludencias-no-card
 
 ### Adicionado

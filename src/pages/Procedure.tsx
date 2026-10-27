@@ -65,7 +65,6 @@ export function ProcedurePage() {
           <p className="font-mono text-lg text-moss">{formatCode(proc.c)}</p>
           <h2 className="font-display mt-1 max-w-3xl text-3xl md:text-4xl">{proc.n}</h2>
           {notaDe(proc.c) && <p className="mt-2 max-w-3xl text-sm text-moss">{notaDe(proc.c)}</p>}
-          <ExcludenciaStrip proc={proc} className="mt-3 max-w-3xl overflow-hidden rounded-xl border border-[#f3c4c0]" />
         </div>
         <div className="flex flex-wrap gap-2 no-print">
           <FavoriteWithAlert proc={proc} label />
@@ -121,6 +120,7 @@ export function ProcedurePage() {
           </span>
         ))}
       </div>
+      <ExcludenciaStrip proc={proc} className="mt-4 overflow-hidden rounded-xl border border-[#f3c4c0]" />
 
       <div className="mt-6 flex gap-1 overflow-x-auto border-b border-line">
         {TABS.map((item) => (

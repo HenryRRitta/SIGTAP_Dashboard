@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Search } from "lucide-react";
-import { digits, formatCode } from "../lib/format";
+import { digits, formatCode, looksLikeCid } from "../lib/format";
 import { useSigtap } from "../lib/store";
 
 export type TypeaheadHit = {
@@ -9,6 +9,7 @@ export type TypeaheadHit = {
   title: string;
   detail: string;
   kind: "procedimento" | "cid" | "cbo";
+  viaCid?: boolean;
 };
 
 export type TypeaheadSource = "procedimentos" | "cid-cbo";
@@ -75,6 +76,7 @@ export function TypeaheadField({
       }
     }
 
+    const cidQuery = looksLikeCid(q);
     for (const proc of searchNome(q).slice(0, 8)) {
       if (out.some((h) => h.kind === "procedimento" && h.code === proc.c)) continue;
       out.push({
@@ -83,6 +85,7 @@ export function TypeaheadField({
         title: proc.n,
         detail: maps?.grupo.get(proc.g) ?? `Grupo ${proc.g}`,
         kind: "procedimento",
+        viaCid: cidQuery,
       });
       if (out.filter((h) => h.kind === "procedimento").length >= 8) break;
     }
@@ -189,8 +192,15 @@ export function TypeaheadField({
             onMouseEnter={() => setActive(i)}
             onClick={() => escolher(hit)}
           >
-            <span className="font-mono text-[12px] text-moss">
-              {hit.kind === "procedimento" ? formatCode(hit.code) : hit.code}
+            <span className="flex items-center gap-1.5">
+              <span className="font-mono text-[12px] text-moss">
+                {hit.kind === "procedimento" ? formatCode(hit.code) : hit.code}
+              </span>
+              {hit.viaCid ? (
+                <span className="rounded-full bg-moss px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white">
+                  CID
+                </span>
+              ) : null}
             </span>
             <span className="line-clamp-2 text-ink">{hit.title}</span>
             <span className="text-[11px] text-mute">{hit.detail}</span>
