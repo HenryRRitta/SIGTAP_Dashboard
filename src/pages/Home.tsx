@@ -19,7 +19,7 @@ import {
   tituloCategoria,
   type CategoriaConsulta,
 } from "../lib/consulta";
-import { compactInt, formatCode, money } from "../lib/format";
+import { COMPLEX_TONE, compactInt, formatCode, money } from "../lib/format";
 import { useSigtap } from "../lib/store";
 import type { Procedure } from "../lib/types";
 
@@ -218,13 +218,37 @@ export function HomePage() {
 
       <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.9fr)_minmax(360px,1fr)]">
         <section className="exe-panel min-w-0 overflow-hidden">
-          <div className="flex items-center justify-between gap-2 px-4 py-3">
-            <h2 className="text-base font-semibold text-navy-950">
-              {tituloCategoria(categoria)} ({compactInt(rows.length)})
-            </h2>
-            <small className="text-xs text-mute">
-              Exibindo {(pageSafe - 1) * PAGE_SIZE + (slice.length ? 1 : 0)}–{(pageSafe - 1) * PAGE_SIZE + slice.length} de {compactInt(rows.length)}
-            </small>
+          <div className="flex flex-col gap-2 px-4 py-3">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-base font-semibold text-navy-950">
+                {tituloCategoria(categoria)} ({compactInt(rows.length)})
+              </h2>
+              <small className="text-xs text-mute">
+                Exibindo {(pageSafe - 1) * PAGE_SIZE + (slice.length ? 1 : 0)}–{(pageSafe - 1) * PAGE_SIZE + slice.length} de {compactInt(rows.length)}
+              </small>
+            </div>
+            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por complexidade">
+              {[{ v: "", n: "Todas" }, ...Object.entries(data!.lookups.complexidade).map(([v, n]) => ({ v, n }))].map((opt) => {
+                const on = cx === opt.v;
+                return (
+                  <button
+                    key={opt.v || "todas"}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => patch({ cx: opt.v })}
+                    className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                      on
+                        ? opt.v
+                          ? COMPLEX_TONE[opt.v] ?? "bg-navy-950 text-white"
+                          : "bg-navy-950 text-white"
+                        : "border border-line bg-card text-mute hover:border-moss/40 hover:text-moss"
+                    }`}
+                  >
+                    {opt.n}
+                  </button>
+                );
+              })}
+            </div>
           </div>
           <div className="max-h-[540px] overflow-auto px-2 pb-2">
             <table className="exe-table w-full min-w-[860px] text-left text-[11px]">

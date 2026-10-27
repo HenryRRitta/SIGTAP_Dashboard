@@ -5,6 +5,11 @@ Alterações notáveis do projeto. Formato baseado em [Keep a Changelog](https:/
 
 ---
 
+## [2026-10-27] - filtro-complexidade-barra
+
+### Adicionado
+- Botões de complexidade na barra “Registros encontrados” da mesa: Todas, Não se aplica, Atenção Básica, Média complexidade e Alta complexidade (`src/pages/Home.tsx`), com os rótulos oficiais de `lookups.complexidade`.
+
 ## [2026-10-27] - pill-cid-typeahead
 
 ### Adicionado
