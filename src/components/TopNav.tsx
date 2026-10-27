@@ -80,19 +80,23 @@ export function TopNav() {
             </Link>
           );
         })}
-        <details className="relative">
-          <summary className="cursor-pointer list-none whitespace-nowrap rounded-md px-2.5 py-3 text-[13px] text-[#d9e7f9] hover:bg-[#1a538c] hover:text-white [&::-webkit-details-marker]:hidden">
-            Auditoria
-          </summary>
-          <div className="absolute right-0 z-50 mt-1 min-w-44 rounded-lg border border-line bg-white py-1 text-ink shadow-card">
-            {MORE.map((item) => (
-              <NavLink key={item.to} to={item.to} className="block px-3 py-2 text-sm hover:bg-leaf">
-                {item.label}
-              </NavLink>
-            ))}
-          </div>
-        </details>
       </nav>
+      {/* Fora do nav com overflow-x-auto, que cortaria o menu aberto. */}
+      <details className="relative hidden shrink-0 lg:block">
+        <summary className="cursor-pointer list-none whitespace-nowrap rounded-md px-2.5 py-3 text-[13px] text-[#d9e7f9] hover:bg-[#1a538c] hover:text-white [&::-webkit-details-marker]:hidden">
+          Auditoria
+        </summary>
+        <div
+          className="absolute right-0 z-50 mt-1 min-w-44 rounded-lg border border-line bg-white py-1 text-ink shadow-card"
+          onClick={(e) => e.currentTarget.closest("details")?.removeAttribute("open")}
+        >
+          {MORE.map((item) => (
+            <NavLink key={item.to} to={item.to} className="block px-3 py-2 text-sm hover:bg-leaf">
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+      </details>
       <div className="ml-auto flex items-center gap-2">
         <CompetenciaSelect />
         <form className="hidden items-center gap-1.5 rounded-md bg-white px-2.5 text-[#385b83] sm:flex" onSubmit={buscar}>
