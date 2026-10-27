@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ClipboardCheck, Copy, FileDown, GitCompare } from "lucide-react";
 import { BackLink } from "../components/BackLink";
-import { FavoriteButton } from "../components/FavoriteButton";
+import { ExcludenciaStrip, FavoriteWithAlert } from "../components/Excludencia";
 import { auditScore, runAudit } from "../lib/audit";
 import { COMPAT_LABEL, COMPLEX_TONE, formatCode, money, relOf } from "../lib/format";
 import { checklistGlosa, familiaDaConta } from "../lib/glosa";
@@ -65,9 +65,10 @@ export function ProcedurePage() {
           <p className="font-mono text-lg text-moss">{formatCode(proc.c)}</p>
           <h2 className="font-display mt-1 max-w-3xl text-3xl md:text-4xl">{proc.n}</h2>
           {notaDe(proc.c) && <p className="mt-2 max-w-3xl text-sm text-moss">{notaDe(proc.c)}</p>}
+          <ExcludenciaStrip proc={proc} className="mt-3 max-w-3xl overflow-hidden rounded-xl border border-[#f3c4c0]" />
         </div>
         <div className="flex flex-wrap gap-2 no-print">
-          <FavoriteButton code={proc.c} label />
+          <FavoriteWithAlert proc={proc} label />
           <Link to={`/auditoria/${proc.c}`} className="rounded-xl bg-moss px-3 py-2 text-sm text-white">
             <ClipboardCheck size={15} className="mr-1 inline" />
             Simular conta

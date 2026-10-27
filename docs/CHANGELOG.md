@@ -5,6 +5,15 @@ Alterações notáveis do projeto. Formato baseado em [Keep a Changelog](https:/
 
 ---
 
+## [2026-10-27] - excludencias-no-card
+
+### Adicionado
+- Faixa “Não cobrar junto” no rodapé do card, na ficha lateral e na ficha completa, só quando `rl_procedimento_compativel.tp_compatibilidade` for tipo 2 (`src/components/Excludencia.tsx`).
+- Ícone de alerta ao lado da estrela de favorito nos mesmos pontos, mais catálogo/pesquisa, favoritos e sessão rápida.
+
+### Alterado
+- `excludenciasOf` em `src/lib/format.ts` passa a listar os pares excludentes oficiais, sem misturar `rel.excecoes`.
+
 ## [2026-10-16] - sincronizacao-competencia-10-2026
 
 ### Adicionado

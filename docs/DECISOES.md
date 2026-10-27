@@ -46,3 +46,9 @@
 - **Decisão**: listar e baixar do FTP DATASUS o último ZIP de cada mês; gravar gzip em `data/competencias/`; o seletor troca a tabela ativa. Só entram meses publicados no FTP.
 - **Status**: fechada com o usuário
 
+### [ADR-008] Excludência visível no card e na ficha
+- **Data**: 27/10/2026
+- **Contexto**: Henry pediu sinalizar automaticamente os pares excludentes da tabela unificada, com destaque visual e alerta ao lado do favorito.
+- **Decisão**: usar só `rl_procedimento_compativel` tipo 2 (`tp_compatibilidade` = Excludente). Não misturar com `rel.excecoes`. Faixa “Não cobrar junto” no rodapé do card/ficha; ícone de alerta só quando houver pelo menos um par. Até 3 códigos na faixa; o restante vira “e mais N”.
+- **Status**: fechada com o usuário
+

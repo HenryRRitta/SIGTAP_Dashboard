@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { COMPAT_LABEL, COMPLEX_TONE, formatCode, money, relOf } from "../lib/format";
 import type { CompetenciaDiff, Procedure } from "../lib/types";
 import { useSigtap } from "../lib/store";
-import { FavoriteButton } from "./FavoriteButton";
+import { ExcludenciaStrip, FavoriteWithAlert } from "./Excludencia";
 
 const TABS = ["Valores", "Atributos", "CID/CBO", "Compatibilidades", "Histórico"] as const;
 
@@ -46,7 +46,7 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
           <p className="text-xs text-mute">Competência {data.meta.competenciaLabel}</p>
         </div>
         <div className="flex items-center gap-2">
-          <FavoriteButton code={proc.c} />
+          <FavoriteWithAlert proc={proc} />
           <Link to={`/procedimento/${proc.c}`} className="text-xs font-semibold text-moss hover:underline">
             Ficha completa
           </Link>
@@ -56,6 +56,7 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
         <p className="font-mono text-lg font-semibold text-moss">{formatCode(proc.c)}</p>
         <p className="text-[13px] font-semibold uppercase leading-snug text-navy-950">{proc.n}</p>
       </div>
+      <ExcludenciaStrip proc={proc} className="-mx-4 mt-3" />
       <div className="mt-3 flex flex-wrap gap-1.5">
         {rel.modalidades.slice(0, 2).map((m) => (
           <span key={m} className="rounded-full bg-leaf px-2 py-1 text-[11px] text-moss">

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import { formatCode, money } from "../lib/format";
 import { useSigtap } from "../lib/store";
-import { FavoriteButton } from "./FavoriteButton";
+import { FavoriteWithAlert } from "./Excludencia";
 
 function Tile({ code, showUses = false }: { code: string; showUses?: boolean }) {
   const { byCode, usage } = useSigtap();
@@ -13,9 +13,9 @@ function Tile({ code, showUses = false }: { code: string; showUses?: boolean }) 
   return (
     <article className="relative min-h-[116px] rounded-xl border-2 border-moss/20 bg-card shadow-card transition hover:border-moss/55">
       <div className="absolute right-2 top-2 z-10">
-        <FavoriteButton code={proc.c} />
+        <FavoriteWithAlert proc={proc} />
       </div>
-      <Link to={`/procedimento/${proc.c}`} className="block h-full p-4 pr-14">
+      <Link to={`/procedimento/${proc.c}`} className="block h-full p-4 pr-24">
         <p className="font-mono text-[13px] font-semibold text-moss">{formatCode(proc.c)}</p>
         <h3 className="mt-1 line-clamp-2 text-sm font-semibold leading-snug">{proc.n}</h3>
         <p className="mt-2 text-sm text-mute">

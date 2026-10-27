@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import { BackLink } from "../components/BackLink";
-import { FavoriteButton } from "../components/FavoriteButton";
+import { FavoriteWithAlert } from "../components/Excludencia";
 import { FavoritesSession } from "../components/FavoritesSession";
 import { ProcedureCard } from "../components/ProcedureCard";
 import { SearchBox } from "../components/SearchBox";
@@ -93,7 +93,7 @@ export function FavoritosPage() {
                       {usage[p.c] ?? 0}×
                     </span>
                   </Link>
-                  <FavoriteButton code={p.c} />
+                  <FavoriteWithAlert proc={p} />
                 </li>
             ))}
           </ul>

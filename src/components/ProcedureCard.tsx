@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import type { Procedure } from "../lib/types";
 import { COMPLEX_TONE, formatCode, money, relOf } from "../lib/format";
 import { useSigtap } from "../lib/store";
-import { FavoriteButton } from "./FavoriteButton";
+import { ExcludenciaStrip, FavoriteWithAlert } from "./Excludencia";
 
 export function ProcedureCard({ proc }: { proc: Procedure }) {
   const { data, maps } = useSigtap();
@@ -10,7 +10,7 @@ export function ProcedureCard({ proc }: { proc: Procedure }) {
   const cx = data?.lookups.complexidade[proc.cx] ?? proc.cx;
 
   return (
-    <article className="rounded-xl border border-line bg-card shadow-card transition hover:border-moss/40">
+    <article className="overflow-hidden rounded-xl border border-line bg-card shadow-card transition hover:border-moss/40">
       <div className="flex items-start gap-2 p-4">
         <Link to={`/procedimento/${proc.c}`} className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -36,8 +36,9 @@ export function ProcedureCard({ proc }: { proc: Procedure }) {
             ))}
           </div>
         </Link>
-        <FavoriteButton code={proc.c} />
+        <FavoriteWithAlert proc={proc} />
       </div>
+      <ExcludenciaStrip proc={proc} />
     </article>
   );
 }

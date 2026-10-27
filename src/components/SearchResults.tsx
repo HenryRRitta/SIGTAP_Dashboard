@@ -1,6 +1,6 @@
 import { LayoutGrid, Table2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { FavoriteButton } from "./FavoriteButton";
+import { FavoriteWithAlert } from "./Excludencia";
 import { ProcedureCard } from "./ProcedureCard";
 import { COMPLEX_TONE, compactInt, formatCode, money, relOf } from "../lib/format";
 import { useSigtap } from "../lib/store";
@@ -109,7 +109,7 @@ export function SearchResults({
                 return (
                   <tr key={p.c} className="border-t border-line hover:bg-mist">
                     <td className="px-2 py-2 text-center">
-                      <FavoriteButton code={p.c} />
+                      <FavoriteWithAlert proc={p} className="justify-center" />
                     </td>
                     <td className="px-4 py-3">
                       <Link to={`/procedimento/${p.c}`} className="block">
