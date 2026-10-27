@@ -5,6 +5,21 @@ Alterações notáveis do projeto. Formato baseado em [Keep a Changelog](https:/
 
 ---
 
+## [2026-10-27] - renomear-coluna-compatibilidade
+
+### Alterado
+- Coluna da tabela da mesa renomeada de "Status" para "Compatibilidade" (`src/pages/Home.tsx`).
+
+## [2026-10-27] - status-relacoes-tabela
+
+### Adicionado
+- Coluna Status entre Complexidade e SA na mesa (`src/pages/Home.tsx`): ícone verde (link para a ficha) quando há compatibilidades (tipos 1, 3, 4 e 5) e triângulo vermelho quando há excludência (tipo 2), lidos de `rl_procedimento_compativel`.
+- Typeahead da busca: pill “N compatibilidades” e triângulo de excludência ao lado do código (`src/components/TypeaheadField.tsx`).
+
+### Alterado
+- Mesa empilha a tabela em largura total e a ficha abaixo; valores, classificação e cards da ficha passam a usar a linha inteira (`src/pages/Home.tsx`, `src/components/ProcedurePanel.tsx`).
+- Badge verde da coluna Status passa a mostrar a quantidade de compatibilidades no lugar do ícone de elo (`src/components/Excludencia.tsx`).
+
 ## [2026-10-27] - cards-ficha-lateral
 
 ### Adicionado

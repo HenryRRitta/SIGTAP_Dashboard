@@ -34,52 +34,33 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
   const excluido = diff?.excluidos.find((x) => x.c === proc.c);
 
   return (
-    <aside className="exe-panel min-w-0 overflow-hidden p-0">
+    <aside className="exe-panel overflow-hidden p-0">
       <div className="p-4">
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <div>
-          <h2 className="text-base font-semibold text-navy-950">Detalhes do procedimento</h2>
-          <p className="text-xs text-mute">Competência {data.meta.competenciaLabel}</p>
+        <div className="mb-3 flex items-start justify-between gap-2">
+          <div>
+            <h2 className="text-base font-semibold text-navy-950">Detalhes do procedimento</h2>
+            <p className="text-xs text-mute">Competência {data.meta.competenciaLabel}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <FavoriteWithAlert proc={proc} />
+            <Link to={`/procedimento/${proc.c}`} className="text-xs font-semibold text-moss hover:underline">
+              Ficha completa
+            </Link>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <FavoriteWithAlert proc={proc} />
-          <Link to={`/procedimento/${proc.c}`} className="text-xs font-semibold text-moss hover:underline">
-            Ficha completa
-          </Link>
+        <div className="flex items-start gap-3 border-t border-line pt-3">
+          <p className="shrink-0 font-mono text-lg font-semibold text-moss">{formatCode(proc.c)}</p>
+          <p className="text-[13px] font-semibold uppercase leading-snug text-navy-950">{proc.n}</p>
         </div>
-      </div>
-      <div className="flex items-start gap-3 border-t border-line pt-3">
-        <p className="font-mono text-lg font-semibold text-moss">{formatCode(proc.c)}</p>
-        <p className="text-[13px] font-semibold uppercase leading-snug text-navy-950">{proc.n}</p>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {rel.modalidades.slice(0, 2).map((m) => (
-          <span key={m} className="rounded-full bg-leaf px-2 py-1 text-[11px] text-moss">
-            {maps.modalidade.get(m) ?? m}
-          </span>
-        ))}
-        <span className={`rounded-full px-2 py-1 text-[11px] ${COMPLEX_TONE[proc.cx]}`}>{cx}</span>
-      </div>
-      <dl className="mt-4 grid grid-cols-[7.5rem_1fr] gap-x-3 gap-y-2 text-xs">
-        <dt className="font-semibold text-mute">Grupo</dt>
-        <dd>
-          {proc.g} · {maps.grupo.get(proc.g)}
-        </dd>
-        <dt className="font-semibold text-mute">Subgrupo</dt>
-        <dd>
-          {proc.sg} · {maps.subgrupo.get(`${proc.g}${proc.sg}`)}
-        </dd>
-        <dt className="font-semibold text-mute">Forma</dt>
-        <dd>
-          {proc.fo} · {maps.forma.get(`${proc.g}${proc.sg}${proc.fo}`)}
-        </dd>
-        <dt className="font-semibold text-mute">Instrumento</dt>
-        <dd>{rel.registros.map((r) => maps.registro.get(r) ?? r).join(", ") || "—"}</dd>
-        <dt className="font-semibold text-mute">Financiamento</dt>
-        <dd>{maps.financiamento.get(proc.fin) ?? "—"}</dd>
-      </dl>
-      <div className="mt-3">
-        <div className="grid grid-cols-4 gap-1.5">
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {rel.modalidades.slice(0, 2).map((m) => (
+            <span key={m} className="rounded-full bg-leaf px-2 py-1 text-[11px] text-moss">
+              {maps.modalidade.get(m) ?? m}
+            </span>
+          ))}
+          <span className={`rounded-full px-2 py-1 text-[11px] ${COMPLEX_TONE[proc.cx]}`}>{cx}</span>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
           <Valor k="SA" v={money(proc.sa)} />
           <Valor k="SH" v={money(proc.sh)} />
           <Valor k="SP" v={money(proc.sp)} />
@@ -88,12 +69,39 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
         <p className="mt-2 text-[11px] leading-relaxed text-mute">
           Total de referência = SH + SA + SP desta competência, como na tabela unificada. Ausência de componente aparece como R$ 0,00 na fonte oficial.
         </p>
-      </div>
+        <dl className="mt-4 grid gap-3 text-xs sm:grid-cols-2 lg:grid-cols-5">
+          <div>
+            <dt className="font-semibold text-mute">Grupo</dt>
+            <dd className="mt-0.5">
+              {proc.g} · {maps.grupo.get(proc.g)}
+            </dd>
+          </div>
+          <div>
+            <dt className="font-semibold text-mute">Subgrupo</dt>
+            <dd className="mt-0.5">
+              {proc.sg} · {maps.subgrupo.get(`${proc.g}${proc.sg}`)}
+            </dd>
+          </div>
+          <div>
+            <dt className="font-semibold text-mute">Forma</dt>
+            <dd className="mt-0.5">
+              {proc.fo} · {maps.forma.get(`${proc.g}${proc.sg}${proc.fo}`)}
+            </dd>
+          </div>
+          <div>
+            <dt className="font-semibold text-mute">Instrumento</dt>
+            <dd className="mt-0.5">{rel.registros.map((r) => maps.registro.get(r) ?? r).join(", ") || "—"}</dd>
+          </div>
+          <div>
+            <dt className="font-semibold text-mute">Financiamento</dt>
+            <dd className="mt-0.5">{maps.financiamento.get(proc.fin) ?? "—"}</dd>
+          </div>
+        </dl>
       </div>
       <ExcludenciaStrip proc={proc} />
-      <div className="grid gap-2 p-3">
+      <div className="grid grid-cols-1 gap-2 p-3 md:grid-cols-2 xl:grid-cols-4">
         <RelCard title="Atributos">
-          <dl className="grid grid-cols-2 gap-2 text-xs">
+          <dl className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3 xl:grid-cols-2">
             <Item k="Sexo" v={data.lookups.sexo[proc.sx] ?? proc.sx} />
             <Item k="Qtd. máx." v={proc.qmax?.toString() ?? "—"} />
             <Item k="Permanência" v={proc.perm != null ? `${proc.perm} dia(s)` : "—"} />
@@ -119,7 +127,7 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
           {rel.cbos.length === 0 ? (
             <p className="text-xs text-mute">Nenhum vínculo nesta competência.</p>
           ) : (
-            <ul className="max-h-28 overflow-auto text-xs">
+            <ul className="max-h-36 overflow-auto text-xs">
               {rel.cbos.slice(0, 30).map((c) => (
                 <li key={c} className="border-t border-line/60 py-1 first:border-t-0">
                   <Link className="font-mono text-moss" to={`/cid?q=${encodeURIComponent(c.trim())}`}>
@@ -131,7 +139,9 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
             </ul>
           )}
         </RelCard>
-        <HistCard diff={diff} hist={hist} incluido={incluido} excluido={excluido} />
+        <div className="md:col-span-2 xl:col-span-4">
+          <HistCard diff={diff} hist={hist} incluido={incluido} excluido={excluido} />
+        </div>
       </div>
     </aside>
   );
@@ -249,7 +259,7 @@ function HistCard({
 
 function RelCard({ title, count, children }: { title: string; count?: number; children: ReactNode }) {
   return (
-    <article className="rounded-[10px] border border-line bg-mist px-3 py-2.5">
+    <article className="h-full rounded-[10px] border border-line bg-mist px-3 py-2.5">
       <h3 className="mb-2 flex items-center justify-between text-xs font-semibold text-navy-950">
         {title}
         {count != null ? (
@@ -278,7 +288,7 @@ function CidBloco({
       {codes.length === 0 ? (
         <p className="mt-0.5 text-xs text-mute">Nenhum vínculo nesta competência.</p>
       ) : (
-        <ul className="mt-0.5 max-h-28 overflow-auto text-xs">
+        <ul className="mt-0.5 max-h-36 overflow-auto text-xs">
           {codes.slice(0, 30).map((c) => (
             <li key={c} className="border-t border-line/60 py-1 first:border-t-0">
               <Link className="font-mono text-moss" to={`/cid?q=${encodeURIComponent(c.trim())}`}>

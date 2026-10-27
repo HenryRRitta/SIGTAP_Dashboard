@@ -1,6 +1,6 @@
 import { TriangleAlert } from "lucide-react";
 import { Link } from "react-router-dom";
-import { excludenciasOf, formatCode } from "../lib/format";
+import { compatibilidadesOf, excludenciasOf, formatCode } from "../lib/format";
 import { useSigtap } from "../lib/store";
 import type { Procedure } from "../lib/types";
 import { FavoriteButton } from "./FavoriteButton";
@@ -24,19 +24,66 @@ export function FavoriteWithAlert({
   );
 }
 
-export function ExcludenciaAlert({ proc }: { proc: Procedure }) {
+export function ExcludenciaAlert({
+  proc,
+  compact = false,
+}: {
+  proc: Procedure;
+  compact?: boolean;
+}) {
   const n = excludenciasOf(proc).length;
   if (n === 0) return null;
   const rotulo =
     n === 1 ? "Há 1 excludência cadastrada" : `Há ${n} excludências cadastradas`;
   return (
     <span
-      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#f3c4c0] bg-danger-bg text-danger"
+      className={
+        compact
+          ? "inline-flex size-7 items-center justify-center rounded-lg border border-[#f3c4c0] bg-danger-bg text-danger"
+          : "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#f3c4c0] bg-danger-bg text-danger"
+      }
       title={rotulo}
       aria-label={rotulo}
     >
-      <TriangleAlert size={16} aria-hidden="true" />
+      <TriangleAlert size={compact ? 14 : 16} aria-hidden="true" />
     </span>
+  );
+}
+
+export function CompatibilidadeLink({
+  proc,
+  compact = false,
+}: {
+  proc: Procedure;
+  compact?: boolean;
+}) {
+  const n = compatibilidadesOf(proc).length;
+  if (n === 0) return null;
+  const rotulo =
+    n === 1 ? "Há 1 compatibilidade cadastrada" : `Há ${n} compatibilidades cadastradas`;
+  return (
+    <Link
+      to={`/procedimento/${proc.c}`}
+      title={rotulo}
+      aria-label={rotulo}
+      onClick={(e) => e.stopPropagation()}
+      className={
+        compact
+          ? "inline-flex h-7 min-w-7 items-center justify-center rounded-lg border border-[#b7e4c0] bg-success-bg px-1 text-[11px] font-semibold tabular text-success hover:border-success"
+          : "inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-xl border border-[#b7e4c0] bg-success-bg px-1.5 text-sm font-semibold tabular text-success hover:border-success"
+      }
+    >
+      {n}
+    </Link>
+  );
+}
+
+export function RelacaoStatus({ proc }: { proc: Procedure }) {
+  return (
+    <div className="inline-flex items-center justify-center gap-1">
+      <CompatibilidadeLink proc={proc} compact />
+      <ExcludenciaAlert proc={proc} compact />
+    </div>
   );
 }
 

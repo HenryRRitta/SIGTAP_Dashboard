@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { Search } from "lucide-react";
-import { digits, formatCode, looksLikeCid } from "../lib/format";
+import { Search, TriangleAlert } from "lucide-react";
+import { compatibilidadesOf, digits, excludenciasOf, formatCode, looksLikeCid } from "../lib/format";
 import { useSigtap } from "../lib/store";
 
 export type TypeaheadHit = {
@@ -10,6 +10,8 @@ export type TypeaheadHit = {
   detail: string;
   kind: "procedimento" | "cid" | "cbo";
   viaCid?: boolean;
+  compatN?: number;
+  excludN?: number;
 };
 
 export type TypeaheadSource = "procedimentos" | "cid-cbo";
@@ -86,6 +88,8 @@ export function TypeaheadField({
         detail: maps?.grupo.get(proc.g) ?? `Grupo ${proc.g}`,
         kind: "procedimento",
         viaCid: cidQuery,
+        compatN: compatibilidadesOf(proc).length,
+        excludN: excludenciasOf(proc).length,
       });
       if (out.filter((h) => h.kind === "procedimento").length >= 8) break;
     }
@@ -192,13 +196,27 @@ export function TypeaheadField({
             onMouseEnter={() => setActive(i)}
             onClick={() => escolher(hit)}
           >
-            <span className="flex items-center gap-1.5">
+            <span className="flex flex-wrap items-center gap-1.5">
               <span className="font-mono text-[12px] text-moss">
                 {hit.kind === "procedimento" ? formatCode(hit.code) : hit.code}
               </span>
               {hit.viaCid ? (
                 <span className="rounded-full bg-moss px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white">
                   CID
+                </span>
+              ) : null}
+              {hit.kind === "procedimento" && hit.compatN ? (
+                <span className="rounded-full bg-success-bg px-2 py-0.5 text-[10px] font-semibold text-success">
+                  {hit.compatN === 1 ? "1 compatibilidade" : `${hit.compatN} compatibilidades`}
+                </span>
+              ) : null}
+              {hit.kind === "procedimento" && hit.excludN ? (
+                <span
+                  className="inline-flex size-5 items-center justify-center rounded-md border border-[#f3c4c0] bg-danger-bg text-danger"
+                  title={hit.excludN === 1 ? "Há 1 excludência cadastrada" : `Há ${hit.excludN} excludências cadastradas`}
+                  aria-label={hit.excludN === 1 ? "Há 1 excludência cadastrada" : `Há ${hit.excludN} excludências cadastradas`}
+                >
+                  <TriangleAlert size={11} aria-hidden="true" />
                 </span>
               ) : null}
             </span>

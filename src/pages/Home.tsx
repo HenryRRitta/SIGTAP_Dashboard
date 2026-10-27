@@ -9,6 +9,7 @@ import {
   Network,
   Pill,
 } from "lucide-react";
+import { RelacaoStatus } from "../components/Excludencia";
 import { IntegrityBar } from "../components/IntegrityBar";
 import { ProcedurePanel } from "../components/ProcedurePanel";
 import { TypeaheadField } from "../components/TypeaheadField";
@@ -216,102 +217,105 @@ export function HomePage() {
         </div>
       )}
 
-      <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.9fr)_minmax(360px,1fr)]">
-        <section className="exe-panel min-w-0 overflow-hidden">
-          <div className="flex flex-col gap-2 px-4 py-3">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="text-base font-semibold text-navy-950">
-                {tituloCategoria(categoria)} ({compactInt(rows.length)})
-              </h2>
-              <small className="text-xs text-mute">
-                Exibindo {(pageSafe - 1) * PAGE_SIZE + (slice.length ? 1 : 0)}–{(pageSafe - 1) * PAGE_SIZE + slice.length} de {compactInt(rows.length)}
-              </small>
-            </div>
-            <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por complexidade">
-              {[{ v: "", n: "Todas" }, ...Object.entries(data!.lookups.complexidade).map(([v, n]) => ({ v, n }))].map((opt) => {
-                const on = cx === opt.v;
-                return (
-                  <button
-                    key={opt.v || "todas"}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() => patch({ cx: opt.v })}
-                    className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                      on
-                        ? opt.v
-                          ? COMPLEX_TONE[opt.v] ?? "bg-navy-950 text-white"
-                          : "bg-navy-950 text-white"
-                        : "border border-line bg-card text-mute hover:border-moss/40 hover:text-moss"
-                    }`}
-                  >
-                    {opt.n}
-                  </button>
-                );
-              })}
-            </div>
+      <section className="exe-panel min-w-0 overflow-hidden">
+        <div className="flex flex-col gap-2 px-4 py-3">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-base font-semibold text-navy-950">
+              {tituloCategoria(categoria)} ({compactInt(rows.length)})
+            </h2>
+            <small className="text-xs text-mute">
+              Exibindo {(pageSafe - 1) * PAGE_SIZE + (slice.length ? 1 : 0)}–{(pageSafe - 1) * PAGE_SIZE + slice.length} de {compactInt(rows.length)}
+            </small>
           </div>
-          <div className="max-h-[540px] overflow-auto px-2 pb-2">
-            <table className="exe-table w-full min-w-[860px] text-left text-[11px]">
-              <thead>
-                <tr>
-                  {["Código", "Descrição", "Grupo", "Subgrupo", "Forma", "Complexidade", "SA (R$)", "SH (R$)", "SP (R$)", "Total ref."].map((h) => (
-                    <th key={h} className="px-2 py-2.5 whitespace-nowrap">
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {slice.map((p) => (
-                  <tr
-                    key={p.c}
-                    className={p.c === selected?.c ? "selected" : ""}
-                    tabIndex={0}
-                    onClick={() => selecionar(p)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        selecionar(p);
-                      }
-                    }}
-                  >
-                    <td className="px-2 py-2.5 font-mono text-moss whitespace-nowrap">{formatCode(p.c)}</td>
-                    <td className="px-2 py-2.5 max-w-[280px] truncate">{p.n}</td>
-                    <td className="px-2 py-2.5">{p.g}</td>
-                    <td className="px-2 py-2.5">{p.sg}</td>
-                    <td className="px-2 py-2.5">{p.fo}</td>
-                    <td className="px-2 py-2.5">{data!.lookups.complexidade[p.cx] ?? p.cx}</td>
-                    <td className="tabular px-2 py-2.5 text-right">{money(p.sa)}</td>
-                    <td className="tabular px-2 py-2.5 text-right">{money(p.sh)}</td>
-                    <td className="tabular px-2 py-2.5 text-right">{money(p.sp)}</td>
-                    <td className="tabular px-2 py-2.5 text-right font-semibold">{money(p.tot)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {rows.length === 0 && (
-              <p className="p-8 text-center text-sm text-mute">
-                Nenhum resultado{q ? ` para “${q}”` : ""} nesta competência.
-                <button type="button" className="ml-2 text-moss underline" onClick={limpar}>
-                  Limpar busca e filtros
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filtrar por complexidade">
+            {[{ v: "", n: "Todas" }, ...Object.entries(data!.lookups.complexidade).map(([v, n]) => ({ v, n }))].map((opt) => {
+              const on = cx === opt.v;
+              return (
+                <button
+                  key={opt.v || "todas"}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => patch({ cx: opt.v })}
+                  className={`whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                    on
+                      ? opt.v
+                        ? COMPLEX_TONE[opt.v] ?? "bg-navy-950 text-white"
+                        : "bg-navy-950 text-white"
+                      : "border border-line bg-card text-mute hover:border-moss/40 hover:text-moss"
+                  }`}
+                >
+                  {opt.n}
                 </button>
-              </p>
-            )}
+              );
+            })}
           </div>
-          {pages > 1 && (
-            <div className="flex items-center justify-end gap-2 border-t border-line px-3 py-2 text-xs">
-              <button type="button" className="rounded border border-line px-2 py-1 disabled:opacity-40" disabled={pageSafe <= 1} onClick={() => patch({ page: String(pageSafe - 1) }, false)}>
-                Anterior
+        </div>
+        <div className="max-h-[min(48vh,520px)] overflow-auto px-2 pb-2">
+          <table className="exe-table w-full min-w-[960px] text-left text-[11px]">
+            <thead>
+              <tr>
+                {["Código", "Descrição", "Grupo", "Subgrupo", "Forma", "Complexidade", "Compatibilidade", "SA (R$)", "SH (R$)", "SP (R$)", "Total ref."].map((h) => (
+                  <th key={h} className="px-2 py-2.5 whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {slice.map((p) => (
+                <tr
+                  key={p.c}
+                  className={p.c === selected?.c ? "selected" : ""}
+                  tabIndex={0}
+                  onClick={() => selecionar(p)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      selecionar(p);
+                    }
+                  }}
+                >
+                  <td className="px-2 py-2.5 font-mono text-moss whitespace-nowrap">{formatCode(p.c)}</td>
+                  <td className="px-2 py-2.5">{p.n}</td>
+                  <td className="px-2 py-2.5">{p.g}</td>
+                  <td className="px-2 py-2.5">{p.sg}</td>
+                  <td className="px-2 py-2.5">{p.fo}</td>
+                  <td className="px-2 py-2.5">{data!.lookups.complexidade[p.cx] ?? p.cx}</td>
+                  <td className="px-2 py-2.5 text-center">
+                    <RelacaoStatus proc={p} />
+                  </td>
+                  <td className="tabular px-2 py-2.5 text-right">{money(p.sa)}</td>
+                  <td className="tabular px-2 py-2.5 text-right">{money(p.sh)}</td>
+                  <td className="tabular px-2 py-2.5 text-right">{money(p.sp)}</td>
+                  <td className="tabular px-2 py-2.5 text-right font-semibold">{money(p.tot)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {rows.length === 0 && (
+            <p className="p-8 text-center text-sm text-mute">
+              Nenhum resultado{q ? ` para “${q}”` : ""} nesta competência.
+              <button type="button" className="ml-2 text-moss underline" onClick={limpar}>
+                Limpar busca e filtros
               </button>
-              <span className="tabular text-mute">
-                {pageSafe} / {pages}
-              </span>
-              <button type="button" className="rounded border border-line px-2 py-1 disabled:opacity-40" disabled={pageSafe >= pages} onClick={() => patch({ page: String(pageSafe + 1) }, false)}>
-                Próxima
-              </button>
-            </div>
+            </p>
           )}
-        </section>
+        </div>
+        {pages > 1 && (
+          <div className="flex items-center justify-end gap-2 border-t border-line px-3 py-2 text-xs">
+            <button type="button" className="rounded border border-line px-2 py-1 disabled:opacity-40" disabled={pageSafe <= 1} onClick={() => patch({ page: String(pageSafe - 1) }, false)}>
+              Anterior
+            </button>
+            <span className="tabular text-mute">
+              {pageSafe} / {pages}
+            </span>
+            <button type="button" className="rounded border border-line px-2 py-1 disabled:opacity-40" disabled={pageSafe >= pages} onClick={() => patch({ page: String(pageSafe + 1) }, false)}>
+              Próxima
+            </button>
+          </div>
+        )}
+      </section>
+      <div className="mt-3">
         <ProcedurePanel proc={selected} />
       </div>
       <IntegrityBar />

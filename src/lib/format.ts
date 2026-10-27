@@ -94,6 +94,17 @@ export function excludenciasOf(proc?: Procedure): RelCompat[] {
   return [...seen.values()];
 }
 
+/** Relações cadastradas que não são excludentes (tipos 1, 3, 4 e 5). */
+export function compatibilidadesOf(proc?: Procedure): RelCompat[] {
+  const seen = new Map<string, RelCompat>();
+  for (const row of relOf(proc).compat) {
+    if (row.tipo === COMPAT_TIPO_EXCLUDENTE) continue;
+    const key = `${row.tipo}-${row.compativel}`;
+    if (!seen.has(key)) seen.set(key, row);
+  }
+  return [...seen.values()];
+}
+
 export const COMPAT_TONE: Record<string, string> = {
   "1": "bg-success-bg text-success",
   "2": "bg-danger-bg text-danger",
