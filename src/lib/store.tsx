@@ -1,6 +1,7 @@
 import MiniSearch from "minisearch";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -9,6 +10,10 @@ import {
 } from "react";
 import type { Procedure, SigtapData } from "./types";
 import { digits, formatCode, looksLikeCbo, looksLikeCid, looksLikeCode, normalizeQuery } from "./format";
+import { carregarTabelaCompetencia } from "./competenciaApi";
+import { loadTabelaLocal, saveTabelaLocal } from "./sigtapPersist";
+
+const ATIVA_KEY = "mesa-competencia-ativa";
 
 type Maps = {
   proc: Map<string, Procedure>;
@@ -42,6 +47,8 @@ type Store = {
   recent: string[];
   pin: (code: string) => void;
   pinned: string[];
+  usage: Record<string, number>;
+  mostUsed: string[];
   remember: (code: string) => void;
   replaceData: (next: SigtapData) => void;
 };
@@ -52,6 +59,26 @@ async function loadBundled(): Promise<SigtapData> {
   const res = await fetch("/data/sigtap.json");
   if (!res.ok) throw new Error("Não foi possível carregar a tabela SIGTAP.");
   return (await res.json()) as SigtapData;
+}
+
+async function loadInicial(): Promise<SigtapData> {
+  const ativa = localStorage.getItem(ATIVA_KEY);
+  const local = await loadTabelaLocal();
+  if (ativa && local?.meta.competencia === ativa) return local;
+  if (ativa) {
+    try {
+      const fromApi = (await carregarTabelaCompetencia(ativa)) as unknown as SigtapData;
+      if (fromApi.meta?.competencia && Array.isArray(fromApi.procedures)) {
+        void saveTabelaLocal(fromApi);
+        return fromApi;
+      }
+    } catch {
+      /* cai no empacotado ou na última tabela do navegador */
+    }
+  }
+  const bundled = await loadBundled();
+  if (local && (local.meta.competencia ?? "") >= (bundled.meta.competencia ?? "")) return local;
+  return bundled;
 }
 
 function buildMaps(data: SigtapData): Maps {
@@ -88,15 +115,39 @@ function readList(key: string): string[] {
   }
 }
 
+function readUsage(): Record<string, number> {
+  try {
+    const raw = localStorage.getItem("mesa-usage");
+    const parsed = raw ? (JSON.parse(raw) as Record<string, number>) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function bumpAllowed(code: string) {
+  try {
+    const key = `mesa-usage-bump:${code}`;
+    const now = Date.now();
+    const last = Number(sessionStorage.getItem(key) ?? "0");
+    if (now - last < 2500) return false;
+    sessionStorage.setItem(key, String(now));
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 export function SigtapProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<SigtapData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [recent, setRecent] = useState<string[]>(() => readList("mesa-recent"));
   const [pinned, setPinned] = useState<string[]>(() => readList("mesa-pinned"));
+  const [usage, setUsage] = useState<Record<string, number>>(() => readUsage());
 
   useEffect(() => {
-    loadBundled()
+    loadInicial()
       .then(setData)
       .catch((err: unknown) => setError(err instanceof Error ? err.message : "Erro ao carregar"))
       .finally(() => setLoading(false));
@@ -122,6 +173,39 @@ export function SigtapProvider({ children }: { children: ReactNode }) {
     return ms;
   }, [data]);
 
+  const remember = useCallback((code: string) => {
+    if (code.length !== 10) return;
+    setRecent((prev) => {
+      if (prev[0] === code) return prev;
+      const next = [code, ...prev.filter((c) => c !== code)].slice(0, 12);
+      localStorage.setItem("mesa-recent", JSON.stringify(next));
+      return next;
+    });
+    if (!bumpAllowed(code)) return;
+    setUsage((prev) => {
+      const next = { ...prev, [code]: (prev[code] ?? 0) + 1 };
+      localStorage.setItem("mesa-usage", JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const pin = useCallback((code: string) => {
+    if (code.length !== 10) return;
+    setPinned((prev) => {
+      const next = prev.includes(code) ? prev.filter((c) => c !== code) : [code, ...prev].slice(0, 40);
+      localStorage.setItem("mesa-pinned", JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const mostUsed = useMemo(
+    () =>
+      Object.entries(usage)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+        .map(([c]) => c),
+    [usage],
+  );
+
   const value: Store = {
     loading,
     error,
@@ -129,27 +213,19 @@ export function SigtapProvider({ children }: { children: ReactNode }) {
     maps,
     recent,
     pinned,
-    replaceData: (next) => setData(next),
-    remember: (code) => {
-      if (code.length !== 10) return;
-      setRecent((prev) => {
-        if (prev[0] === code) return prev;
-        const next = [code, ...prev.filter((c) => c !== code)].slice(0, 12);
-        localStorage.setItem("mesa-recent", JSON.stringify(next));
-        return next;
-      });
+    usage,
+    mostUsed,
+    replaceData: (next) => {
+      setData(next);
+      localStorage.setItem(ATIVA_KEY, next.meta.competencia);
+      void saveTabelaLocal(next);
     },
+    remember,
     byCode: (code) => {
       const d = digits(code);
       return maps?.proc.get(d) ?? maps?.proc.get(d.padStart(10, "0"));
     },
-    pin: (code) => {
-      setPinned((prev) => {
-        const next = prev.includes(code) ? prev.filter((c) => c !== code) : [code, ...prev].slice(0, 40);
-        localStorage.setItem("mesa-pinned", JSON.stringify(next));
-        return next;
-      });
-    },
+    pin,
     search: (q) => {
       if (!data || !maps || !mini) return [];
       const raw = q.trim();

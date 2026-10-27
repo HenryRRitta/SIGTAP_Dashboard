@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { SearchBox } from "../components/SearchBox";
+import { TypeaheadField } from "../components/TypeaheadField";
 import { formatCode, money, relOf } from "../lib/format";
 import { notaDe, readSerie } from "../lib/local";
 import { useSigtap } from "../lib/store";
@@ -146,7 +147,15 @@ function CompetenciaDiffView() {
         <Kpi n={diff.totais.alterados} l="alterados" />
         <Kpi n={diff.valor.valorDepois - diff.valor.valorAntes} l="Δ soma SH+SA+SP" money />
       </div>
-      <input className="field mt-6" value={filtro} onChange={(e) => setFiltro(e.target.value)} placeholder="Filtrar código ou nome" />
+      <div className="mt-6">
+        <TypeaheadField
+          variant="field"
+          placeholder="Filtrar código ou nome"
+          value={filtro}
+          onChange={setFiltro}
+          onPick={(hit) => setFiltro(hit.kind === "procedimento" ? hit.code : hit.code)}
+        />
+      </div>
       <Section title={`Incluídos (${diff.incluidos.length})`}>
         {diff.incluidos.filter((x) => match(x.c, x.n)).map((x) => (
           <ProcLine key={x.c} c={x.c} n={x.n} extra={money(x.tot)} />

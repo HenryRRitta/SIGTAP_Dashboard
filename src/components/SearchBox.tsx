@@ -1,26 +1,30 @@
-import { Search } from "lucide-react";
 import { useEffect, useRef } from "react";
+import { TypeaheadField, type TypeaheadHit, type TypeaheadSource } from "./TypeaheadField";
 
 export function SearchBox({
   value,
   onChange,
   onSubmit,
+  onPick,
   autoFocus,
   placeholder = "Código, nome, CID-10 ou CBO",
+  source = "procedimentos",
 }: {
   value: string;
   onChange: (value: string) => void;
   onSubmit?: () => void;
+  onPick?: (hit: TypeaheadHit) => void;
   autoFocus?: boolean;
   placeholder?: string;
+  source?: TypeaheadSource;
 }) {
-  const ref = useRef<HTMLInputElement>(null);
+  const ref = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "/" && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "TEXTAREA") {
         e.preventDefault();
-        ref.current?.focus();
+        ref.current?.querySelector("input")?.focus();
       }
     };
     window.addEventListener("keydown", onKey);
@@ -29,27 +33,22 @@ export function SearchBox({
 
   return (
     <form
-      className="flex items-center gap-3 rounded-xl border border-line bg-card px-4 py-3 shadow-card"
+      ref={ref}
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit?.();
       }}
     >
-      <Search size={18} className="text-moss" />
-      <input
-        ref={ref}
-        autoFocus={autoFocus}
+      <TypeaheadField
+        variant="box"
+        source={source}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={onChange}
+        onPick={onPick}
+        onSubmit={onSubmit}
+        autoFocus={autoFocus}
         placeholder={placeholder}
-        className="w-full bg-transparent text-[16px] outline-none placeholder:text-mute"
       />
-      {onSubmit && (
-        <button type="submit" className="hidden min-h-10 rounded-lg bg-moss px-4 py-2 text-sm font-semibold text-white hover:bg-moss-2 sm:inline">
-          Buscar
-        </button>
-      )}
-      {!onSubmit && <kbd className="hidden rounded border border-line px-1.5 font-mono text-[11px] text-mute md:inline">/</kbd>}
     </form>
   );
 }

@@ -1,5 +1,6 @@
 import { LayoutGrid, Table2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { FavoriteWithAlert } from "./Excludencia";
 import { ProcedureCard } from "./ProcedureCard";
 import { COMPLEX_TONE, compactInt, formatCode, money, relOf } from "../lib/format";
 import { useSigtap } from "../lib/store";
@@ -91,6 +92,7 @@ export function SearchResults({
           <table className="w-full min-w-[860px] text-left text-sm">
             <thead>
               <tr className="bg-mist text-[12px] font-semibold text-mute">
+                <th className="w-14 px-2 py-3 text-center">Fav.</th>
                 <th className="px-4 py-3">Procedimento</th>
                 <th className="px-3 py-3">Complexidade</th>
                 <th className="px-3 py-3 text-right">Valor</th>
@@ -106,6 +108,9 @@ export function SearchResults({
                 const cx = data!.lookups.complexidade[p.cx] ?? p.cx;
                 return (
                   <tr key={p.c} className="border-t border-line hover:bg-mist">
+                    <td className="px-2 py-2 text-center">
+                      <FavoriteWithAlert proc={p} className="justify-center" />
+                    </td>
                     <td className="px-4 py-3">
                       <Link to={`/procedimento/${p.c}`} className="block">
                         <span className="font-mono text-moss">{formatCode(p.c)}</span>

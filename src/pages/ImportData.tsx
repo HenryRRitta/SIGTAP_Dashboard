@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { AtualizarCompetencia } from "../components/AtualizarCompetencia";
 import { parseSigtapZip } from "../lib/parseZip";
 import { compactInt } from "../lib/format";
 import { useSigtap } from "../lib/store";
@@ -33,10 +34,17 @@ export function ImportPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h2 className="font-display text-4xl">Competência</h2>
+      <h2 className="text-[26px] font-bold text-navy-950">Base local</h2>
       <p className="mt-2 text-mute">
-        A mesa já vem com a Tabela Unificada <b>{data?.meta.competenciaLabel}</b> ({data?.meta.arquivo}). Para atualizar, baixe o ZIP mensal do DATASUS e importe aqui.
+        A mesa está na Tabela Unificada <b>{data?.meta.competenciaLabel}</b> ({data?.meta.arquivo}
+        {data?.meta.importadoEm
+          ? ` · importada em ${new Date(data.meta.importadoEm).toLocaleString("pt-BR")}`
+          : ""}
+        ). O botão abaixo busca sozinho a competência mais nova no DATASUS.
       </p>
+      <div className="mt-6">
+        <AtualizarCompetencia />
+      </div>
       <section className="mt-6 rounded-xl border border-line bg-card p-5">
         <h3 className="font-display text-xl">Onde baixar</h3>
         <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed">
@@ -75,7 +83,7 @@ export function ImportPage() {
             if (file) void onFile(file);
           }}
         />
-        <p className="font-medium text-moss">{busy ? "Importando…" : "Solte ou clique para enviar o ZIP da competência"}</p>
+        <p className="font-medium text-moss">{busy ? "Importando…" : "Ou envie um ZIP baixado à mão"}</p>
         <p className="mt-1 text-sm text-mute">{status || "Ex.: TabelaUnificada_202608_v2608141139.zip"}</p>
       </label>
       {data && (

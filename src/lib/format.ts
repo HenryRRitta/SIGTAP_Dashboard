@@ -1,4 +1,4 @@
-import type { Procedure } from "./types";
+import type { Procedure, RelCompat } from "./types";
 
 export function digits(value: string): string {
   return value.replace(/\D/g, "");
@@ -81,6 +81,29 @@ export const COMPAT_LABEL: Record<string, string> = {
   "4": "Sequencial",
   "5": "Obrigatória",
 };
+
+/** Tipo 2 em `rl_procedimento_compativel.tp_compatibilidade` (tabela unificada). */
+export const COMPAT_TIPO_EXCLUDENTE = "2";
+
+export function excludenciasOf(proc?: Procedure): RelCompat[] {
+  const seen = new Map<string, RelCompat>();
+  for (const row of relOf(proc).compat) {
+    if (row.tipo !== COMPAT_TIPO_EXCLUDENTE) continue;
+    if (!seen.has(row.compativel)) seen.set(row.compativel, row);
+  }
+  return [...seen.values()];
+}
+
+/** Relações cadastradas que não são excludentes (tipos 1, 3, 4 e 5). */
+export function compatibilidadesOf(proc?: Procedure): RelCompat[] {
+  const seen = new Map<string, RelCompat>();
+  for (const row of relOf(proc).compat) {
+    if (row.tipo === COMPAT_TIPO_EXCLUDENTE) continue;
+    const key = `${row.tipo}-${row.compativel}`;
+    if (!seen.has(key)) seen.set(key, row);
+  }
+  return [...seen.values()];
+}
 
 export const COMPAT_TONE: Record<string, string> = {
   "1": "bg-success-bg text-success",

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { BackLink } from "../components/BackLink";
 import { SearchBox } from "../components/SearchBox";
@@ -23,7 +23,15 @@ export function SearchPage() {
   const termo = (params.get("q") ?? "").trim();
   const [q, setQ] = useState(params.get("q") ?? "");
   const [view, setView] = useState<SearchView>(() => readView(params.get("view")));
-  const hits = useMemo(() => (termo ? searchNome(termo) : []), [termo, searchNome]);
+  const hits = useMemo(() => (q.trim() ? searchNome(q) : []), [q, searchNome]);
+
+  useEffect(() => {
+    const next = q.trim();
+    if (next === termo) return;
+    const timer = window.setTimeout(() => atualizar(next), 250);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q]);
 
   function atualizar(nextQ: string, nextView = view) {
     const p = new URLSearchParams();
@@ -63,6 +71,10 @@ export function SearchPage() {
           value={q}
           onChange={setQ}
           onSubmit={() => atualizar(q)}
+          onPick={(hit) => {
+            setQ(hit.title);
+            atualizar(hit.title);
+          }}
           autoFocus
           placeholder="Nome do procedimento, código, CID ou CBO"
         />
