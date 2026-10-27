@@ -1,20 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { COMPAT_LABEL, COMPLEX_TONE, formatCode, money, relOf } from "../lib/format";
-import type { CompetenciaDiff, Procedure } from "../lib/types";
+import { COMPAT_LABEL, COMPAT_TONE, COMPLEX_TONE, formatCode, money, relOf } from "../lib/format";
+import type { CompetenciaDiff, Procedure, RelCompat } from "../lib/types";
 import { useSigtap } from "../lib/store";
 import { ExcludenciaStrip, FavoriteWithAlert } from "./Excludencia";
 
-const TABS = ["Valores", "Atributos", "CID/CBO", "Compatibilidades", "Histórico"] as const;
+const COMPAT_VISIVEIS = 8;
 
 export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
   const { data, maps } = useSigtap();
-  const [tab, setTab] = useState<(typeof TABS)[number]>("Valores");
   const [diff, setDiff] = useState<CompetenciaDiff | null>(null);
-
-  useEffect(() => {
-    setTab("Valores");
-  }, [proc?.c]);
 
   useEffect(() => {
     fetch("/data/diff.json")
@@ -83,106 +78,61 @@ export function ProcedurePanel({ proc }: { proc: Procedure | undefined }) {
         <dt className="font-semibold text-mute">Financiamento</dt>
         <dd>{maps.financiamento.get(proc.fin) ?? "—"}</dd>
       </dl>
-      <div className="mt-3 flex gap-1 overflow-x-auto border-t border-line">
-        {TABS.map((item) => (
-          <button
-            key={item}
-            type="button"
-            onClick={() => setTab(item)}
-            className={`shrink-0 border-b-2 px-2 py-3 text-[11px] ${
-              tab === item ? "border-moss font-bold text-moss" : "border-transparent text-mute"
-            }`}
-          >
-            {item}
-          </button>
-        ))}
+      <div className="mt-3">
+        <div className="grid grid-cols-4 gap-1.5">
+          <Valor k="SA" v={money(proc.sa)} />
+          <Valor k="SH" v={money(proc.sh)} />
+          <Valor k="SP" v={money(proc.sp)} />
+          <Valor k="Total ref." v={money(proc.tot)} emph />
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-mute">
+          Total de referência = SH + SA + SP desta competência, como na tabela unificada. Ausência de componente aparece como R$ 0,00 na fonte oficial.
+        </p>
       </div>
-      {tab === "Valores" && (
-        <div className="mt-3">
-          <div className="grid grid-cols-4 gap-1.5">
-            <Valor k="SA" v={money(proc.sa)} />
-            <Valor k="SH" v={money(proc.sh)} />
-            <Valor k="SP" v={money(proc.sp)} />
-            <Valor k="Total ref." v={money(proc.tot)} emph />
-          </div>
-          <p className="mt-2 text-[11px] leading-relaxed text-mute">
-            Total de referência = SH + SA + SP desta competência, como na tabela unificada. Ausência de componente aparece como R$ 0,00 na fonte oficial.
-          </p>
-        </div>
-      )}
-      {tab === "Atributos" && (
-        <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
-          <Item k="Sexo" v={data.lookups.sexo[proc.sx] ?? proc.sx} />
-          <Item k="Qtd. máx." v={proc.qmax?.toString() ?? "—"} />
-          <Item k="Permanência" v={proc.perm != null ? `${proc.perm} dia(s)` : "—"} />
-          <Item k="Idade mín." v={proc.iminL ?? "—"} />
-          <Item k="Idade máx." v={proc.imaxL ?? "—"} />
-          <Item k="Rubrica" v={proc.rub ? maps.rubrica.get(proc.rub) ?? proc.rub : "—"} />
-        </dl>
-      )}
-      {tab === "CID/CBO" && (
-        <div className="mt-3 space-y-3 text-xs">
-          <Lista titulo={`CID principal (${rel.cidsP.length})`} itens={rel.cidsP.map((c) => `${c} · ${data.cids[c]?.n ?? ""}`)} />
-          <Lista titulo={`CID secundário (${rel.cidsS.length})`} itens={rel.cidsS.map((c) => `${c} · ${data.cids[c]?.n ?? ""}`)} />
-          <Lista titulo={`CBO (${rel.cbos.length})`} itens={rel.cbos.map((c) => `${c} · ${data.cbos[c] ?? ""}`)} />
-        </div>
-      )}
-      {tab === "Compatibilidades" && (
-        <div className="mt-3 max-h-56 overflow-auto text-xs">
-          {rel.compat.length === 0 ? (
-            <p className="text-mute">Nenhuma compatibilidade cadastrada neste procedimento.</p>
+      </div>
+      <ExcludenciaStrip proc={proc} />
+      <div className="grid gap-2 p-3">
+        <RelCard title="Atributos">
+          <dl className="grid grid-cols-2 gap-2 text-xs">
+            <Item k="Sexo" v={data.lookups.sexo[proc.sx] ?? proc.sx} />
+            <Item k="Qtd. máx." v={proc.qmax?.toString() ?? "—"} />
+            <Item k="Permanência" v={proc.perm != null ? `${proc.perm} dia(s)` : "—"} />
+            <Item k="Idade mín." v={proc.iminL ?? "—"} />
+            <Item k="Idade máx." v={proc.imaxL ?? "—"} />
+            <Item k="Rubrica" v={proc.rub ? maps.rubrica.get(proc.rub) ?? proc.rub : "—"} />
+          </dl>
+        </RelCard>
+        <CompatCard rows={rel.compat} names={data.names} />
+        <RelCard title="CID" count={rel.cidsP.length + rel.cidsS.length}>
+          <CidBloco
+            titulo={`Principal (${rel.cidsP.length})`}
+            codes={rel.cidsP}
+            nomes={data.cids}
+          />
+          <CidBloco
+            titulo={`Secundário (${rel.cidsS.length})`}
+            codes={rel.cidsS}
+            nomes={data.cids}
+          />
+        </RelCard>
+        <RelCard title="CBO" count={rel.cbos.length}>
+          {rel.cbos.length === 0 ? (
+            <p className="text-xs text-mute">Nenhum vínculo nesta competência.</p>
           ) : (
-            <ul className="space-y-2">
-              {rel.compat.slice(0, 40).map((row, i) => (
-                <li key={`${row.compativel}-${i}`}>
-                  <span className="font-medium">{COMPAT_LABEL[row.tipo] ?? row.tipo}</span>
-                  {" · "}
-                  <Link className="font-mono text-moss" to={`/procedimento/${row.compativel}`}>
-                    {formatCode(row.compativel)}
+            <ul className="max-h-28 overflow-auto text-xs">
+              {rel.cbos.slice(0, 30).map((c) => (
+                <li key={c} className="border-t border-line/60 py-1 first:border-t-0">
+                  <Link className="font-mono text-moss" to={`/cid?q=${encodeURIComponent(c.trim())}`}>
+                    {c.trim()}
                   </Link>{" "}
-                  {data.names[row.compativel]}
+                  {data.cbos[c] ?? ""}
                 </li>
               ))}
             </ul>
           )}
-          <Link to={`/compat`} className="mt-2 inline-block text-moss hover:underline">
-            Abrir conferência de pares
-          </Link>
-        </div>
-      )}
-      {tab === "Histórico" && (
-        <div className="mt-3 text-xs text-mute">
-          {!diff ? (
-            <p>Carregando comparação de competências disponíveis…</p>
-          ) : hist ? (
-            <div>
-              <p className="font-medium text-ink">
-                Alterado de {diff.deLabel} para {diff.paraLabel}
-              </p>
-              <ul className="mt-2 space-y-1">
-                {Object.entries(hist.ch).map(([k, v]) => (
-                  <li key={k}>
-                    {k}: {fmtPar(v)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : incluido ? (
-            <p className="text-ink">Incluído na competência {diff.paraLabel}. Não havia registro comparável em {diff.deLabel}.</p>
-          ) : excluido ? (
-            <p>Este código constava em {diff.deLabel} e não está vigente em {diff.paraLabel}.</p>
-          ) : (
-            <p>
-              Sem variação de valores entre {diff.deLabel} e {diff.paraLabel} para este código. Não há série de competências anteriores carregada.
-            </p>
-          )}
-          <Link to="/comparar?tab=competencia" className="mt-2 inline-block text-moss hover:underline">
-            Ver o que mudou no mês
-          </Link>
-        </div>
-      )}
+        </RelCard>
+        <HistCard diff={diff} hist={hist} incluido={incluido} excluido={excluido} />
       </div>
-      <ExcludenciaStrip proc={proc} />
     </aside>
   );
 }
@@ -205,16 +155,137 @@ function Item({ k, v }: { k: string; v: string }) {
   );
 }
 
-function Lista({ titulo, itens }: { titulo: string; itens: string[] }) {
+function uniqueCompat(rows: RelCompat[]) {
+  const seen = new Map<string, RelCompat>();
+  for (const row of rows) {
+    const key = `${row.tipo}-${row.compativel}`;
+    if (!seen.has(key)) seen.set(key, row);
+  }
+  return [...seen.values()];
+}
+
+function CompatCard({ rows, names }: { rows: RelCompat[]; names: Record<string, string> }) {
+  const unicos = uniqueCompat(rows);
+  const visiveis = unicos.slice(0, COMPAT_VISIVEIS);
+  const resto = unicos.length - visiveis.length;
   return (
-    <div>
-      <p className="font-semibold text-ink">{titulo}</p>
-      {itens.length === 0 ? (
-        <p className="text-mute">Nenhum vínculo nesta competência.</p>
+    <RelCard title="Compatibilidades" count={unicos.length}>
+      {unicos.length === 0 ? (
+        <p className="text-xs text-mute">Nenhuma compatibilidade cadastrada neste procedimento.</p>
       ) : (
-        <ul className="mt-1 max-h-28 overflow-auto">
-          {itens.slice(0, 30).map((t) => (
-            <li key={t}>{t}</li>
+        <>
+          <ul className="max-h-36 overflow-auto text-xs">
+            {visiveis.map((row) => (
+              <li key={`${row.tipo}-${row.compativel}`} className="border-t border-line/60 py-1.5 first:border-t-0">
+                <span className={`mr-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${COMPAT_TONE[row.tipo] ?? "bg-neutral-bg text-neutral"}`}>
+                  {COMPAT_LABEL[row.tipo] ?? row.tipo}
+                </span>
+                <Link className="font-mono text-moss" to={`/procedimento/${row.compativel}`}>
+                  {formatCode(row.compativel)}
+                </Link>{" "}
+                {names[row.compativel] ?? ""}
+              </li>
+            ))}
+          </ul>
+          {resto > 0 ? <p className="mt-1 text-[11px] font-medium text-moss">e mais {resto}</p> : null}
+          <Link to="/compat" className="mt-1.5 inline-block text-[11px] font-semibold text-moss hover:underline">
+            Abrir conferência de pares
+          </Link>
+        </>
+      )}
+    </RelCard>
+  );
+}
+
+function HistCard({
+  diff,
+  hist,
+  incluido,
+  excluido,
+}: {
+  diff: CompetenciaDiff | null;
+  hist: CompetenciaDiff["alterados"][number] | undefined;
+  incluido: CompetenciaDiff["incluidos"][number] | undefined;
+  excluido: CompetenciaDiff["excluidos"][number] | undefined;
+}) {
+  return (
+    <RelCard title="Histórico">
+      <div className="text-xs text-mute">
+        {!diff ? (
+          <p>Carregando comparação de competências disponíveis…</p>
+        ) : hist ? (
+          <div>
+            <p className="font-medium text-ink">
+              Alterado de {diff.deLabel} para {diff.paraLabel}
+            </p>
+            <ul className="mt-2 space-y-1">
+              {Object.entries(hist.ch).map(([k, v]) => (
+                <li key={k}>
+                  {k}: {fmtPar(v)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : incluido ? (
+          <p className="text-ink">
+            Incluído na competência {diff.paraLabel}. Não havia registro comparável em {diff.deLabel}.
+          </p>
+        ) : excluido ? (
+          <p>
+            Este código constava em {diff.deLabel} e não está vigente em {diff.paraLabel}.
+          </p>
+        ) : (
+          <p>
+            Sem variação de valores entre {diff.deLabel} e {diff.paraLabel} para este código. Não há série de competências anteriores carregada.
+          </p>
+        )}
+        <Link to="/comparar?tab=competencia" className="mt-2 inline-block text-[11px] font-semibold text-moss hover:underline">
+          Ver o que mudou no mês
+        </Link>
+      </div>
+    </RelCard>
+  );
+}
+
+function RelCard({ title, count, children }: { title: string; count?: number; children: ReactNode }) {
+  return (
+    <article className="rounded-[10px] border border-line bg-mist px-3 py-2.5">
+      <h3 className="mb-2 flex items-center justify-between text-xs font-semibold text-navy-950">
+        {title}
+        {count != null ? (
+          <span className="inline-flex min-w-[1.4rem] justify-center rounded-full bg-leaf px-1.5 py-px text-[11px] tabular font-medium text-moss">
+            {count}
+          </span>
+        ) : null}
+      </h3>
+      {children}
+    </article>
+  );
+}
+
+function CidBloco({
+  titulo,
+  codes,
+  nomes,
+}: {
+  titulo: string;
+  codes: string[];
+  nomes: Record<string, { n: string }>;
+}) {
+  return (
+    <div className="mt-2 first:mt-0">
+      <p className="text-[11px] font-semibold text-mute">{titulo}</p>
+      {codes.length === 0 ? (
+        <p className="mt-0.5 text-xs text-mute">Nenhum vínculo nesta competência.</p>
+      ) : (
+        <ul className="mt-0.5 max-h-28 overflow-auto text-xs">
+          {codes.slice(0, 30).map((c) => (
+            <li key={c} className="border-t border-line/60 py-1 first:border-t-0">
+              <Link className="font-mono text-moss" to={`/cid?q=${encodeURIComponent(c.trim())}`}>
+                {c.trim()}
+              </Link>{" "}
+              {nomes[c]?.n ?? ""}
+            </li>
           ))}
         </ul>
       )}

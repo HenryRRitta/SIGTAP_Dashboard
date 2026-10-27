@@ -5,6 +5,14 @@ Alterações notáveis do projeto. Formato baseado em [Keep a Changelog](https:/
 
 ---
 
+## [2026-10-27] - cards-ficha-lateral
+
+### Adicionado
+- Cards sempre visíveis abaixo da tarja de excludência na ficha lateral: Atributos, Compatibilidades, CID (principal + secundário), CBO e Histórico (`src/components/ProcedurePanel.tsx`).
+
+### Removido
+- Abas da ficha lateral (Valores ficou fixo no topo; o restante não precisa mais de clique).
+
 ## [2026-10-27] - filtro-complexidade-barra
 
 ### Adicionado
